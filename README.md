@@ -6,9 +6,10 @@ Aan de hand van een ESP-WROOM-32 en een touchscreen LCD als basis wordt een 4-di
 Wanneer 5 keer een foutieve code wordt ingevoerd zal het deurtje ook opengaan maar zal er weergegeven dat het 'game over' is.
 
 ## Materiaal
-. ESP-WROOM-32
-. TFT SPI 240x320 touchscreen LCD
-. Solenoïde
-. 12V netstroom adapter
-. 12V to 3.3V step down convertor
-. 12V relay
+* ESP-WROOM-32
+* TFT SPI 240x320 touchscreen LCD
+* Solenoïde
+* 12V netstroom adapter
+* 12V to 3.3V step down convertor
+* 3.3V naar 5V step up convertor
+* 12V relay (5V aansturing)
