@@ -9,7 +9,7 @@ Wanneer 5 keer een foutieve code wordt ingevoerd zal het deurtje ook opengaan ma
 * ESP-WROOM-32
 * TFT SPI 240x320 touchscreen LCD
 * Solenoïde
-* 12V netstroom adapter
+* 11.1V LiPo batterij
 * 12V to 3.3V step down convertor
 * 3.3V naar 5V step up convertor
 * 12V relay (5V aansturing)
