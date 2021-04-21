@@ -326,9 +326,9 @@ void retrieveTouch()
 }
 
 void openDoor(){
-  digitalWrite(7, HIGH);
+  digitalWrite(DO, LOW);
   delay(2000);
-  digitalWrite(7, LOW); 
+  digitalWrite(DO, HIGH); 
 }
 
 void gameOver(){
@@ -379,7 +379,7 @@ void succes(){
   tft.setCursor(35,thirdRow + verticalAlign);
   tft.println("SUCCESS");
   openDoor();
-  delay(60000);
+  delay(6000);
   setup(); 
 }
 
@@ -440,7 +440,7 @@ void callback(char *topic, byte *message, unsigned int length)
   Serial.println();
 
   // Feel free to add more if statements to control more GPIOs with MQTT
-  // When receiving a message on "esp32/+/control" a check should be excecuted
+  // When receiving a message on "esp32/+/control" a check should be executed
 
   // If a message is received on the topic esp32/control, you check if the message is either "start" or "stop" (or "reset").
   // Changes the state according to the message
@@ -456,7 +456,12 @@ void callback(char *topic, byte *message, unsigned int length)
       Serial.println("Disconnected");
       setup_disp();
     }
+    if(messageTemp.equals("start")){setup_disp();}
   }
+  if (String(topic) == "esp32/alohomora/code/1"){code[0] = (int) message[0];}
+  if (String(topic) == "esp32/alohomora/code/2"){code[1] = (int) message[0];}
+  if (String(topic) == "esp32/alohomora/code/3"){code[2] = (int) message[0];}
+  if (String(topic) == "esp32/alohomora/code/4"){code[3] = (int) message[0];}
 }
 
 void setup() {
@@ -482,7 +487,7 @@ void setup() {
   
   //Setup gedeelte voor display
   pinMode(DO, OUTPUT); 
-  digitalWrite(7, LOW); 
+  digitalWrite(DO, HIGH); 
     
   //Serial.begin(9600);
   
@@ -522,9 +527,9 @@ void reconnect()
       Serial.println("connected");
       connected = true;
       // Publish
-      client.publish("esp32/alohomora/control", "start");
+      client.publish("esp32/alohomora/control", "Touchlock gestart");
       // ... and resubscribe
-      client.subscribe("esp32/alohomora/control");
+      client.subscribe("esp32/alohomora/+");
       Serial.print("gelukt");
     }
     else
