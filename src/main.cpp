@@ -458,10 +458,10 @@ void callback(char *topic, byte *message, unsigned int length)
     }
     if(messageTemp.equals("start")){setup_disp();}
   }
-  if (String(topic) == "esp32/alohomora/code/1"){code[0] = (int) message[0];}
-  if (String(topic) == "esp32/alohomora/code/2"){code[1] = (int) message[0];}
-  if (String(topic) == "esp32/alohomora/code/3"){code[2] = (int) message[0];}
-  if (String(topic) == "esp32/alohomora/code/4"){code[3] = (int) message[0];}
+  if (String(topic) == "esp32/alohomora/code/1"){code[0] = (byte)message[0];}
+  if (String(topic) == "esp32/alohomora/code/2"){code[1] = (byte) message[0];}
+  if (String(topic) == "esp32/alohomora/code/3"){code[2] = (byte) message[0];}
+  if (String(topic) == "esp32/alohomora/code/4"){code[3] = (byte) message[0];}
 }
 
 void setup() {
