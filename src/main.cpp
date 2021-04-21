@@ -529,7 +529,7 @@ void reconnect()
       // Publish
       client.publish("esp32/alohomora/control", "Touchlock gestart");
       // ... and resubscribe
-      client.subscribe("esp32/alohomora/+");
+      client.subscribe("esp32/alohomora/#");
       Serial.print("gelukt");
     }
     else
