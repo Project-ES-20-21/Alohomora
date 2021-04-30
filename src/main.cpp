@@ -50,7 +50,6 @@ void setup_wifi()
 {
   delay(10);
   Serial.println("Connecting to WiFi..");
-
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PWD);
 
@@ -472,7 +471,7 @@ void setup() {
   //Serial.begin(115200);
   Serial.begin(9600);
   
-  setup_wifi();
+  /*setup_wifi();
   client.setServer(MQTT_SERVER, MQTT_PORT);
   client.setCallback(callback);
 
@@ -483,7 +482,7 @@ void setup() {
 
   AsyncElegantOTA.begin(&server);    // Start ElegantOTA
   server.begin();
-  Serial.println("HTTP server started");
+  Serial.println("HTTP server started");*/
   
   //Setup gedeelte voor display
   pinMode(DO, OUTPUT); 
@@ -545,14 +544,14 @@ void reconnect()
 
 void loop() {
   //wifi gedeelte
-  if(wifi){
+  /*if(wifi){
     if (!connected)
       {
       reconnect();
       }
     client.loop();
     AsyncElegantOTA.loop();
-  }
+  }*/
   //display gedeelte
   retrieveTouch();
   //int boxHeightRow1 = verticalAlign + BOXSIZE;
