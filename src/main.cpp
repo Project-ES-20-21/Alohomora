@@ -69,7 +69,7 @@ void setup_wifi()
 // Touch display defines
 #define LCD_RD  2  //LED
 #define LCD_WR  4
-#define LCD_RS 15  //or LCD_CD - hard-wired to GPIO35
+#define LCD_RS 35  //or LCD_CD - hard-wired to GPIO15
 #define LCD_CS 33  //hard-wired to A3 (GPIO34)
 #define LCD_RST 32 //hard-wired to A4 (GPIO36)
 
@@ -130,6 +130,7 @@ uint16_t boxcolor = NEONGREEN;
 // input en correcte code
 byte code[4] = {1, 2, 3, 4};
 byte input[4] = {11, 11, 11, 11};
+byte ontvangen[4] = {0, 0, 1, 0};
 
 // positie van de input (0-3)
 byte pos;
@@ -337,9 +338,11 @@ void gameOver(){
     tft.println("GAME");
     tft.setCursor(leftColPositionX,thirdRow + verticalAlign);
     tft.println("OVER");
-    delay(1000);
+    delay(2000);
     tft.fillScreen(BLACK);
-    delay(1000);
+    delay(2000);
+    openDoor();
+    delay(2000);
     gameOver();
 }
 
@@ -367,7 +370,6 @@ void fail(){
     
   } else {
     // GAME OVER
-    openDoor();
     gameOver();
   }
 }
@@ -379,6 +381,9 @@ void succes(){
   tft.println("SUCCESS");
   openDoor();
   delay(6000);
+  openDoor();
+  delay(6000);
+  openDoor();
   setup(); 
 }
 
@@ -423,6 +428,26 @@ void setup_disp(){
   Serial.println(F("Press any button on the TFT screen: "));
 }
 
+void nowifi(){
+  for(int i=0; i<4; i++){
+    Serial.print(code[i]);
+  }
+  espClient.stop();
+  delay(100);
+  WiFi.disconnect(true, true);
+  wifi = false;
+  Serial.println("Disconnected");
+  setup_disp();
+}
+
+boolean attempt(){
+  boolean ok = true;
+  for(int i=0; i<4; i++){
+    if(ontvangen[i]==0) ok = false;
+  }
+  return ok;
+}
+
 // callback function, only used when receiving messages
 void callback(char *topic, byte *message, unsigned int length)
 {
@@ -447,20 +472,30 @@ void callback(char *topic, byte *message, unsigned int length)
   {
     if(messageTemp.equals("open")){openDoor();}
     if(messageTemp.equals("AddAttempt")){attempts++;}
-    if(messageTemp.equals("ready")){
-      espClient.stop();
-      delay(100);
-      WiFi.disconnect(true, true);
-      wifi = false;
-      Serial.println("Disconnected");
-      setup_disp();
-    }
+    if(messageTemp.equals("ready")){nowifi();}
     if(messageTemp.equals("start")){setup_disp();}
+    if(messageTemp.equals("reset")){setup();}
   }
-  if (String(topic) == "esp32/alohomora/code/1"){code[0] = (byte)message[0];}
-  if (String(topic) == "esp32/alohomora/code/2"){code[1] = (byte) message[0];}
-  if (String(topic) == "esp32/alohomora/code/3"){code[2] = (byte) message[0];}
-  if (String(topic) == "esp32/alohomora/code/4"){code[3] = (byte) message[0];}
+  if (String(topic) == "esp32/alohomora/code1"){
+    code[0] = (byte)message[0];
+    ontvangen[0] = 1;
+    if(attempt()) nowifi();
+    }
+  if (String(topic) == "esp32/alohomora/code2"){
+    code[1] = (byte) message[0];
+    ontvangen[1] = 1;
+    if(attempt()) nowifi();
+    }
+  if (String(topic) == "esp32/alohomora/code3"){
+    code[2] = (byte) message[0];
+    ontvangen[2] = 1;
+    if(attempt()) nowifi();
+    }
+  if (String(topic) == "esp32/alohomora/code4"){
+    code[3] = (byte) message[0];
+    ontvangen[3] = 1;
+    if(attempt()) nowifi();
+    }
 }
 
 void setup() {
@@ -488,7 +523,7 @@ void setup() {
   pinMode(DO, OUTPUT); 
   digitalWrite(DO, HIGH); 
     
-  //Serial.begin(9600);
+  Serial.begin(9600);
   
   tft.reset();  
   uint16_t identifier = tft.readID();
