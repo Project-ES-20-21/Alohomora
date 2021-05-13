@@ -21,7 +21,7 @@
 
 bool connected;
 bool wifi = true;
-
+bool gewonnen = false;    // timer stoppen wanneer gewonnen
 WiFiClient espClient;
 PubSubClient client(espClient);
 long lastMsg = 0;
@@ -388,6 +388,7 @@ void succes(){
   openDoor();
   delay(6000);
   openDoor();
+  gewonnen = true;
   setup(); 
 }
 
@@ -495,6 +496,11 @@ void setup() {
   AsyncElegantOTA.begin(&server);    // Start ElegantOTA
   server.begin();
   Serial.println("HTTP server started");
+
+  if(gewonnen){
+    client.publish("esp32/timer/control", "stop"); //wanneer code is gekraakt, timer laten stoppen zodat nodige tijd bekend is
+    gewonnen = false;
+  }
   
   // ---Setup gedeelte voor display---
   pinMode(DO, OUTPUT); 
