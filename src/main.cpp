@@ -1,20 +1,9 @@
-/*
- * Small Program to Simulate a Numpad using a 2.4" TFT Touchscreen
- * Program does not act as an USB HID Device
- * 
- * Note:
- * This version is complete with styling and numbers,
- * if you want the smaller version get the "numpad-layout" program
- * from https://github.com/williamtavares/Arduino-Uno-NumPad
- * 
- * Enjoy!
-*/
-
+// touchscreen necessities
 #include <Adafruit_GFX.h>
 #include <TouchScreen.h>
 #include <MCUFRIEND_kbv.h>
 
-//wifi and MQTT necessities
+// wifi and MQTT necessities
 #include <WiFi.h>
 #include <PubSubClient.h> //pio lib install "knolleary/PubSubClient"
 
@@ -68,7 +57,7 @@ void setup_wifi()
 
 
 // Touch display defines
-#define LCD_RD  2  //LED
+#define LCD_RD  2
 #define LCD_WR  4
 #define LCD_RS 15  //or LCD_CD - hard-wired to GPIO35
 #define LCD_CS 33  //hard-wired to A3 (GPIO34)
@@ -87,10 +76,10 @@ MCUFRIEND_kbv tft;
 
 #define DO 23   // pin that opens the door to the key
 
-#define YP LCD_CS  // LCD_CS
-#define XM LCD_RS  // LCD_RS
-#define YM LCD_D1  // LCD_D1
-#define XP LCD_D0  // LCD_D0
+#define YM LCD_CS  // LCD_CS
+#define XP LCD_RS  // LCD_RS
+#define YP LCD_D1  // LCD_D1
+#define XM LCD_D0  // LCD_D0
 
 #define TS_MINX 941
 #define TS_MINY 896
@@ -107,12 +96,7 @@ MCUFRIEND_kbv tft;
 #define MINPRESSURE 100
 #define MAXPRESSURE 1000
 
-// For better pressure precision, we need to know the resistance
-// between X+ and X- Use any multimeter to read it
-// For the one we're using, its 300 ohms across the X plate
-// Pins A2-A6
-
-#include "TouchScreen_kbv.h"         //my hacked version
+#include "TouchScreen_kbv.h"
 #define TouchScreen TouchScreen_kbv
 #define TSPoint     TSPoint_kbv
 
@@ -129,6 +113,7 @@ uint16_t tbgcolor = BLACK;
 uint16_t boxcolor = NEONGREEN;
 
 // input en correcte code
+byte nood[4] = {0, 0, 0, 0};
 byte code[4] = {1, 2, 3, 4};
 byte input[4] = {11, 11, 11, 11};
 
@@ -151,35 +136,37 @@ bool isTouching = false;
 
 //MCUFRIEND_kbv tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 
-  //Container variables for touch coordinates
-  int X, Y, Z;
+//Container variables for touch coordinates
+int X, Y, Z;
 
-  
-  //----- Screen reference positions -----//
-  //Screen height without hidden pixel
-  double tHeight = tft.height()-1;
-  //Centering the mid square
-  double center = (tft.width()/2)-(BOXSIZE/2);
-  //Space between squares
-  double padding = 5;
-  //Position of squares to the left and right of center
-  double fromCenter = BOXSIZE + padding;
-  //Second row Y-Axis position
-  double secondRow = BOXSIZE + padding;
-  //Third row Y-Axis position
-  double thirdRow = secondRow + BOXSIZE + padding;
-  //Fourth row Y-Axis position
-  double fourthRow = thirdRow + BOXSIZE + padding;
-  //Fifth row Y-Axis position
-  double fifthRow = fourthRow + BOXSIZE + padding;
-  //Y-Axis align for all squares
-  double verticalAlign = (tHeight-((BOXSIZE * 5)+(padding * 4)))/2;
-  //Left column starting x posision
-  double leftColPositionX = center - fromCenter;
-  //Mid column starting x posision
-  double midColPositionX = center;
-  //Right column starting x posision
-  double rightColPositionX = center + fromCenter;
+
+//----- Screen reference positions -----//
+//Screen height without hidden pixel
+double tHeight = tft.height()-1;
+//Centering the mid square
+double center = (tft.width()/2)-(BOXSIZE/2);
+//Space between squares
+double padding = 5;
+//Position of squares to the left and right of center
+double fromCenter = BOXSIZE + padding;
+//Second row Y-Axis position
+double secondRow = BOXSIZE + padding;
+//Third row Y-Axis position
+double thirdRow = secondRow + BOXSIZE + padding;
+//Fourth row Y-Axis position
+double fourthRow = thirdRow + BOXSIZE + padding;
+//Fifth row Y-Axis position
+double fifthRow = fourthRow + BOXSIZE + padding;
+//Y-Axis align for all squares
+double verticalAlign = (tHeight-((BOXSIZE * 5)+(padding * 4)))/2;
+//Left column starting x posision
+double leftColPositionX = center - fromCenter;
+//Mid column starting x posision
+double midColPositionX = center;
+//Right column starting x posision
+double rightColPositionX = center + fromCenter;
+
+
 
 void createButtons(){
   //(initial x,initial y,width,height,color)
@@ -190,9 +177,7 @@ void createButtons(){
 
   /***Draw filled squares with specified dimensions and position***/
   //First Row
-  //tft.fillRect(leftColPositionX, verticalAlign, BOXSIZE, BOXSIZE, GREY);
   tft.fillRect(leftColPositionX, verticalAlign, (3*BOXSIZE)+(2*padding), BOXSIZE, tbgcolor);
-  //tft.fillRect(rightColPositionX, verticalAlign, BOXSIZE, BOXSIZE, GREY);
   
   //Second Row
   tft.fillRect(leftColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, tbgcolor);
@@ -216,9 +201,7 @@ void createButtons(){
 
   /***Draw Borders around squares***/
   //First Row
-  //tft.drawRect(leftColPositionX, verticalAlign, BOXSIZE, BOXSIZE, BLACK);
   tft.drawRect(leftColPositionX, verticalAlign, (3*BOXSIZE)+(2*padding), BOXSIZE, boxcolor);
-  //tft.drawRect(rightColPositionX, verticalAlign, BOXSIZE, BOXSIZE, BLACK);
 
   //Second Row
   tft.drawRect(leftColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, boxcolor);
@@ -240,6 +223,8 @@ void createButtons(){
   tft.drawRect(midColPositionX, fifthRowVertialAlign, BOXSIZE, BOXSIZE, boxcolor);
   tft.drawRect(rightColPositionX, fifthRowVertialAlign, BOXSIZE, BOXSIZE, boxcolor);
 }
+
+
 
 void insertNumbers(){
   //Centers text horizontally on all three columns
@@ -309,6 +294,8 @@ void insertNumbers(){
   tft.setTextSize(4);
 }
 
+
+
 void retrieveTouch()
 {
     digitalWrite(13, HIGH); 
@@ -325,11 +312,15 @@ void retrieveTouch()
     Z = p.z;
 }
 
+
+
 void openDoor(){
   digitalWrite(DO, LOW);
   delay(2000);
   digitalWrite(DO, HIGH); 
 }
+
+
 
 void gameOver(){
     tft.setTextSize(8);
@@ -343,6 +334,8 @@ void gameOver(){
     delay(1000);
     gameOver();
 }
+
+
 
 void fail(){
   if(attempts > 1){
@@ -369,9 +362,19 @@ void fail(){
   } else {
     // GAME OVER
     openDoor();
+    delay(6000);
+    openDoor();
+    delay(6000);
+    openDoor();
+    delay(6000);
+    openDoor();
+    delay(6000);
+    openDoor();
     gameOver();
   }
 }
+
+
 
 void succes(){
   // SUCCESS 
@@ -380,15 +383,22 @@ void succes(){
   tft.println("SUCCESS");
   openDoor();
   delay(6000);
+  openDoor();
+  delay(6000);
+  openDoor();
+  delay(6000);
+  openDoor();
   setup(); 
 }
+
+
 
 void codeCheck(){
   bool match = true;
   //input vergelijken met code
   for(int i=0; i<4; i++){
     Serial.print(input[i]);
-    if(input[i] != code[i]){
+    if(input[i] != code[i] && input[i] != nood[i]){
       match = false;
     }
   }
@@ -400,6 +410,8 @@ void codeCheck(){
     fail();  
   } 
 }
+
+
 
 void setup_disp(){
   tft.reset();  
@@ -417,12 +429,13 @@ void setup_disp(){
   createButtons();
   insertNumbers();
 
-  //DispCursorX  = leftColPositionX + 25;
   pos = 0;
   firstRowCursorY  = verticalAlign+(BOXSIZE/4);
   tft.setCursor(leftColPositionX + 25 + textsize*pos,firstRowCursorY);
   Serial.println(F("Press any button on the TFT screen: "));
 }
+
+
 
 // callback function, only used when receiving messages
 void callback(char *topic, byte *message, unsigned int length)
@@ -439,11 +452,8 @@ void callback(char *topic, byte *message, unsigned int length)
   }
   Serial.println();
 
-  // Feel free to add more if statements to control more GPIOs with MQTT
   // When receiving a message on "esp32/+/control" a check should be executed
-
-  // If a message is received on the topic esp32/control, you check if the message is either "start" or "stop" (or "reset").
-  // Changes the state according to the message
+  // to decide which action should be excecuted
   if (String(topic) == "esp32/alohomora/control")
   {
     if(messageTemp.equals("open")){openDoor();}
@@ -464,19 +474,20 @@ void callback(char *topic, byte *message, unsigned int length)
   if (String(topic) == "esp32/alohomora/code4"){code[3] = (int) message[0];}
 }
 
+
+
 void setup() {
 
-  //Setup gedeelte voor Wifi en MQTT
+  // ---Setup gedeelte voor Wifi en MQTT---
+
   connected = false;
-  //setup wifi
-  //Serial.begin(115200);
   Serial.begin(9600);
   
   setup_wifi();
   client.setServer(MQTT_SERVER, MQTT_PORT);
   client.setCallback(callback);
 
-  //setup voor OTA
+  // setup voor OTA
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Hi! I am ESP32 touchlock.");
   });
@@ -485,19 +496,18 @@ void setup() {
   server.begin();
   Serial.println("HTTP server started");
   
-  //Setup gedeelte voor display
+  // ---Setup gedeelte voor display---
   pinMode(DO, OUTPUT); 
   digitalWrite(DO, HIGH); 
-    
-  //Serial.begin(9600);
   
   tft.reset();  
   uint16_t identifier = tft.readID();
   tft.begin(identifier);
 
+  // 2 for portrait flipped
   tft.setRotation(2);
 
-  //Background color
+  // Background color
   tft.fillScreen(BLACK);
 
   // cursor box
@@ -506,12 +516,13 @@ void setup() {
   createButtons();
   insertNumbers();
 
-  //DispCursorX  = leftColPositionX + 25;
   pos = 0;
   firstRowCursorY  = verticalAlign+(BOXSIZE/4);
   tft.setCursor(leftColPositionX + 25 + textsize*pos,firstRowCursorY);
   Serial.println(F("Press any button on the TFT screen: "));
 }
+
+
 
 // function to establish MQTT connection
 void reconnect()
@@ -543,6 +554,8 @@ void reconnect()
   }
 }
 
+
+
 void loop() {
   //wifi gedeelte
   if(wifi){
@@ -571,35 +584,30 @@ void loop() {
       //Check if element clicked is in row 2
       if(Y > verticalAlign){
         if(Y < boxHeightRow2){
-             //Serial.println("1");
-             tft.println("1");
-             input[pos]=1;
-             pos++;
-             delay(150); 
+          tft.println("1");
+          input[pos]=1;
+          pos++;
+          delay(150); 
         }
         //Check if element clicked is in row 3
         else if(Y < boxHeightRow3){
-             //Serial.println("4");
-             tft.println("4");
-             input[pos]=4;
-             pos++;
-             delay(150); 
+          tft.println("4");
+          input[pos]=4;
+          pos++;
+          delay(150); 
         }
         //Check if element clicked is in row 4
         else if(Y < boxHeightRow4){
-             //Serial.println("7");
-             tft.println("7");
-             input[pos]=7;
-             pos++;
-             delay(150); 
+          tft.println("7");
+          input[pos]=7;
+          pos++;
+          delay(150); 
         }
         //Check if element clicked is in row 5
         else if(Y < boxHeightRow5){
-             //Serial.println("*");
-             if(pos > 0 && !isAtEnd){pos--;}
-             input[pos]=-1;
-             // tft.fillRect(DispCursorX, firstRowCursorY, textsize, textsize, tbgcolor);
-             delay(150); 
+          if(pos > 0 && !isAtEnd){pos--;}
+          input[pos]=-1;
+          delay(150); 
         }        
       }
        //Check if element clicked is in mid column
@@ -607,35 +615,31 @@ void loop() {
       //Check if element clicked is in row 2
         if(Y > verticalAlign){
           if(Y < boxHeightRow2){
-               //Serial.println("2");
-               tft.println("2");
-               input[pos]=2;
-               pos++;
-               delay(150); 
+            tft.println("2");
+            input[pos]=2;
+            pos++;
+            delay(150); 
           }
           //Check if element clicked is in row 3
           else if(Y < boxHeightRow3){
-               //Serial.println("5");
-               tft.println("5");
-               input[pos]=5;
-               pos++;
-               delay(150); 
+            tft.println("5");
+            input[pos]=5;
+            pos++;
+            delay(150); 
           }
           //Check if element clicked is in row 4
           else if(Y < boxHeightRow4){
-               //Serial.println("8");
-               tft.println("8");
-               input[pos]=8;
-               pos++;
-               delay(150); 
+            tft.println("8");
+            input[pos]=8;
+            pos++;
+            delay(150); 
           }
           //Check if element clicked is in row 5
           else if(Y < boxHeightRow5){
-               //Serial.println("0");
-               tft.println("0");
-               input[pos]=0;
-               pos++;
-               delay(150); 
+            tft.println("0");
+            input[pos]=0;
+            pos++;
+            delay(150); 
           }      
         }
       //Check if element clicked is in third column
@@ -643,34 +647,30 @@ void loop() {
         if(Y > verticalAlign){
           //Check if element clicked is in row 2
           if(Y < boxHeightRow2){
-               //Serial.println("3");
-               tft.println("3");
-               input[pos]=3;
-               pos++;
-               delay(150); 
+            tft.println("3");
+            input[pos]=3;
+            pos++;
+            delay(150); 
           }
           //Check if element clicked is in row 3
           else if(Y < boxHeightRow3){
-               //Serial.println("6");
-               tft.println("6");
-               input[pos]=6;
-               pos++;
-               delay(150); 
+            tft.println("6");
+            input[pos]=6;
+            pos++;
+            delay(150); 
           }
           //Check if element clicked is in row 4
           else if(Y < boxHeightRow4){
-               //Serial.println("9");
-               tft.println("9");
-               input[pos]=9;
-               pos++;
-               delay(150); 
+            tft.println("9");
+            input[pos]=9;
+            pos++;
+            delay(150); 
           }
           //Check if element clicked is in row 5
           else if(Y < boxHeightRow5){
-               //Serial.println("#");
-               //check of code matcht
-               codeCheck();
-               delay(150); 
+            //check if code matches
+            codeCheck();
+            delay(150); 
           }        
         }
     }
