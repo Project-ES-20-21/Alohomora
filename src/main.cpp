@@ -33,6 +33,7 @@ AsyncWebServer server(80);
 
 //define callback method
 void callback(char *topic, byte *message, unsigned int length);
+void setup();
 
 // function for establishing wifi connection, do not touch
 void setup_wifi()
@@ -498,7 +499,13 @@ void setup() {
   Serial.println("HTTP server started");
 
   if(gewonnen){
+    client.connect("alohomora");
+    Serial.println("connected");
+    connected = true;
+    // Publish
     client.publish("esp32/timer/control", "stop"); //wanneer code is gekraakt, timer laten stoppen zodat nodige tijd bekend is
+    // ... and resubscribe
+    client.subscribe("esp32/alohomora/+");
     gewonnen = false;
   }
   
