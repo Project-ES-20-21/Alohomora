@@ -505,7 +505,7 @@ void setup() {
     // Publish
     client.publish("esp32/timer/control", "stop"); //wanneer code is gekraakt, timer laten stoppen zodat nodige tijd bekend is
     // ... and resubscribe
-    client.subscribe("esp32/alohomora/+");
+    client.subscribe("esp32/alohomora/#");
     gewonnen = false;
   }
   
@@ -553,7 +553,7 @@ void reconnect()
       // Publish
       client.publish("esp32/alohomora/control", "Touchlock gestart");
       // ... and resubscribe
-      client.subscribe("esp32/alohomora/+");
+      client.subscribe("esp32/alohomora/#");
       Serial.print("gelukt");
     }
     else
